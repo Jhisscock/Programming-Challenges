@@ -2,29 +2,62 @@ import java.util.*;
 
 //https://open.kattis.com/problems/funnygames
 public class FunnyGames{
+
+    static class Winner{
+        int index;
+        float score;
+
+        public Winner(int newIndex, float newScore){
+            index = newIndex;
+            score = newScore;
+        }
+    }
+    public static float planetSize = 0;
     public static void main(String [] args){
         Scanner sc = new Scanner(System.in);
         int cases = sc.nextInt();
         for(int i = 0; i < cases; i++){
-            int planetSize = sc.nextInt();
+            planetSize = sc.nextFloat();
             int numOfWeapons = sc.nextInt();
-            List<Float> weapons = new ArrayList<Float>();
+            float [] weapons = new float[numOfWeapons];
             for(int j = 0; j < numOfWeapons; j++){
-                weapons.add(sc.nextFloat());
+                weapons[j] = sc.nextFloat();
             }
-            minimax(weapons, 5, true);
+
+            boolean winner = true;
+            while(planetSize > 1){
+                Winner bestMove = new Winner(0, 0);
+                for(int j = 0; j < weapons.length; j++){
+                    planetSize *= MiniMax(weapons, 5, true, weapons[j]);
+                }
+                winner = !winner;
+            }            
+        }
+
+        sc.close();
+    }
+
+    public static float MiniMax(float [] weapons, int depth, boolean player, float currWeapon){
+        if(depth == 0){
+            //Evaluate score of position
+            return 0;
+        }
+        if(player){
+            float max = Float.MIN_VALUE;
+            for (float f : weapons) {
+                float score = MiniMax(weapons, depth, player, f);
+                max = Math.max(score, max);
+            }
+            return max;
+        }else{
+            float min = Float.MAX_VALUE;
+            for (float f : weapons) {
+                float score = MiniMax(weapons, depth, player, f);
+                min = Math.min(score, min);
+            }
+            return min;
         }
     }
 
-    //Mini-max: Player 1 is true
-    private static boolean minimax(List<Float> weapons, int depth, boolean player){
-        if(depth == 0){
-            return false;
-        }
-        if(player){
-            int max = Integer.MIN_VALUE;
-            return true;
-        }
-        return true;
-    }
+    //Find range starting from bottom in which the lowest F would result in a forced win for a player then construct ranges from there to determine winner.
 }
