@@ -17,6 +17,7 @@ public class FunnyGames{
         Scanner sc = new Scanner(System.in);
         int cases = sc.nextInt();
         for(int i = 0; i < cases; i++){
+<<<<<<< Updated upstream
             planetSize = sc.nextFloat();
             int numOfWeapons = sc.nextInt();
             float [] weapons = new float[numOfWeapons];
@@ -32,11 +33,25 @@ public class FunnyGames{
                 }
                 winner = !winner;
             }            
+=======
+            double planetSize = sc.nextDouble();
+            int numOfWeapons = sc.nextInt();
+            double [] weapons = new double [numOfWeapons];
+            for(int j = 0; j < numOfWeapons; j++){
+                weapons[j] = sc.nextDouble();
+            }
+            if(Winner(weapons, planetSize)){
+                System.out.println("Nils");
+            }else{
+                System.out.println("Mikael");
+            }
+>>>>>>> Stashed changes
         }
 
         sc.close();
     }
 
+<<<<<<< Updated upstream
     public static float MiniMax(float [] weapons, int depth, boolean player, float currWeapon){
         if(depth == 0){
             //Evaluate score of position
@@ -57,6 +72,32 @@ public class FunnyGames{
             }
             return min;
         }
+=======
+    private static boolean Winner(double [] weapons, double planetSize){
+        double min = 0.1;
+        double max = 1;
+        for (double f : weapons) {
+            if((1 - f) < (1 - min)){
+                min = f;
+            }
+            if((1 - f) > (1 - max)){
+                max = f;
+            }
+        }
+
+        double topRange = 1;
+        boolean turn = true;
+        while(topRange <= planetSize / max){
+            if(turn){
+                topRange /= max;
+            }else{
+                topRange /= min;
+            }
+            turn = !turn;
+        }
+
+        return turn;
+>>>>>>> Stashed changes
     }
 
     //Find range starting from bottom in which the lowest F would result in a forced win for a player then construct ranges from there to determine winner.
