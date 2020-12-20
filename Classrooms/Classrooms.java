@@ -1,36 +1,73 @@
 import java.util.*;
 import java.io.*;
 
-public class GGG{
-    static int[][] goblinArray = new int[10001][10001];
+public class Classrooms{
+
+    static int lowerBound(ArrayList<Long> a, long x) {
+        int l = -1;
+        int r = a.size();
+
+        while(l + 1 < r) {
+            int m = (l + r)>>>1;
+            if(a.get(m) >= x){
+                r = m;
+            }else{
+                l = m;
+            }
+        }
+
+        return r;
+    }
+
     public static void main(String [] args){
         InputReader io = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
 
-        int goblins = io.nextInt();
-        for(int i = 0; i < goblins; i++){
-            goblinArray[io.nextInt()][io.nextInt()]++;
+        int n = io.nextInt();
+        int rooms = io.nextInt();
+        long[][] events = new long[n][2];
+
+        for(int i = 0; i < n; i++){
+            events[i][0] = io.nextInt();
+            events[i][1] = io.nextInt();
         }
-
-        int sprinklers = io.nextInt();
-        for(int i = 0; i < sprinklers; i++){
-            int x = io.nextInt();
-            int y = io.nextInt();
-            int r = io.nextInt();
-
-            for(int x1 = Math.max(x - r, 0); x1 < Math.min(x + r, 10000) + 1; x1++){
-                for(int y1 = Math.max(y - r, 0); y1 < Math.min(y + r, 10000) + 1; y1++){
-                    if(goblinArray[x1][y1] > 0 && (x - x1) * (x - x1) + (y - y1) * (y - y1) <= r*r){
-                        goblins -= goblinArray[x1][y1];
-                        goblinArray[x1][y1] = 0;
-                    }
+        
+        Arrays.sort(events, new Comparator<long[]>() {
+            @Override
+            public int compare(long[] o1, long[] o2) {
+                if(o1[1] == o2[1]){
+                    return Long.compare(o1[0], o2[0]);
                 }
+                return Long.compare(o1[1], o2[1]);
+            } 
+        });
+
+        int total = 0;
+        ArrayList<Long> endtimes = new ArrayList<Long>();
+        for(int i = 0; i < n; i++){
+            int pos = 0;
+
+            pos = lowerBound(endtimes, -events[i][0]);
+            if(pos == endtimes.size()){
+                if(endtimes.size() < rooms){
+                    endtimes.add(-events[i][1] - 1);
+                    total++;
+                }
+                continue;
             }
+
+            endtimes.remove(pos);
+            endtimes.add(-events[i][1] - 1);
+            total++;
         }
 
-        w.println(goblins);
+        w.println(total);
+
+
         w.close();
     }
+
+    
 
     static class InputReader {
 

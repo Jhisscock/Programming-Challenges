@@ -1,36 +1,72 @@
 import java.util.*;
 import java.io.*;
 
-public class GGG{
-    static int[][] goblinArray = new int[10001][10001];
+public class LT{
+
+    static class Point{
+        double x;
+        double y;
+        long value;
+        int key;
+
+        public Point(double i, double j, long v, int k){
+            x = i;
+            y = j;
+            value = v;
+            key = k;
+        }
+    }
+
+    static Point[] points= new Point[5001];
+    static long[] values = new long[5001];
+
     public static void main(String [] args){
         InputReader io = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
 
-        int goblins = io.nextInt();
-        for(int i = 0; i < goblins; i++){
-            goblinArray[io.nextInt()][io.nextInt()]++;
+        int n = io.nextInt();
+        for(int i = 0; i < n; i++){
+            long x = io.nextLong();
+            long y = io.nextLong();
+            points[i] = new Point((double)x, (double)y, x + y, i);
         }
 
-        int sprinklers = io.nextInt();
-        for(int i = 0; i < sprinklers; i++){
-            int x = io.nextInt();
-            int y = io.nextInt();
-            int r = io.nextInt();
+        long min = Long.MAX_VALUE;
+        long max = Long.MIN_VALUE;
+        int minKey = -1;
+        int maxKey = -1;
+        
+        for(int i = 0; i < n; i++){
+            long curr = points[i].value;
+            if(curr < min){
+                min = curr;
+                minKey = i;
+            }
 
-            for(int x1 = Math.max(x - r, 0); x1 < Math.min(x + r, 10000) + 1; x1++){
-                for(int y1 = Math.max(y - r, 0); y1 < Math.min(y + r, 10000) + 1; y1++){
-                    if(goblinArray[x1][y1] > 0 && (x - x1) * (x - x1) + (y - y1) * (y - y1) <= r*r){
-                        goblins -= goblinArray[x1][y1];
-                        goblinArray[x1][y1] = 0;
-                    }
-                }
+            if(curr > max){
+                max = curr;
+                maxKey = i;
+            }
+        }
+        
+        double diff = points[maxKey].y - points[minKey].y;
+        double minX = points[minKey].x;
+        double minY = points[minKey].y;
+        double maxX = points[maxKey].x;
+        double maxY = points[maxKey].y;
+        double best = Double.MIN_VALUE;
+        for(int i = 0; i < n; i++){
+            double area = Math.abs((minX * (points[i].y - maxY) + points[i].x * diff  + maxX * (minY - points[i].y)) / 2);
+            if(area > best){
+                best = area;
             }
         }
 
-        w.println(goblins);
+        w.println(best);
         w.close();
     }
+
+
 
     static class InputReader {
 

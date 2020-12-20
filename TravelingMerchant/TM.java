@@ -1,36 +1,59 @@
 import java.util.*;
 import java.io.*;
 
-public class GGG{
-    static int[][] goblinArray = new int[10001][10001];
+public class TM{
+    static int[][] values = new int[100001][7];
+
     public static void main(String [] args){
         InputReader io = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
 
-        int goblins = io.nextInt();
-        for(int i = 0; i < goblins; i++){
-            goblinArray[io.nextInt()][io.nextInt()]++;
-        }
-
-        int sprinklers = io.nextInt();
-        for(int i = 0; i < sprinklers; i++){
-            int x = io.nextInt();
-            int y = io.nextInt();
-            int r = io.nextInt();
-
-            for(int x1 = Math.max(x - r, 0); x1 < Math.min(x + r, 10000) + 1; x1++){
-                for(int y1 = Math.max(y - r, 0); y1 < Math.min(y + r, 10000) + 1; y1++){
-                    if(goblinArray[x1][y1] > 0 && (x - x1) * (x - x1) + (y - y1) * (y - y1) <= r*r){
-                        goblins -= goblinArray[x1][y1];
-                        goblinArray[x1][y1] = 0;
-                    }
-                }
+        int cities = io.nextInt();
+        for(int i = 0; i < cities; i++){
+            int initial = io.nextInt();
+            int iterator = io.nextInt();
+            for(int j = 0; j < 4; j++){
+                int currValue = initial + iterator * j;
+                values[i][j] = currValue;
+                values[i][6 - j] = currValue;
             }
         }
 
-        w.println(goblins);
+        int paths = io.nextInt();
+        for(int i = 0; i < paths; i++){
+            int start = io.nextInt() - 1;
+            int end = io.nextInt() - 1;
+
+            w.println(profitForward(Integer.MIN_VALUE, 1, 0, 1, start, end));
+
+
+            
+        }
         w.close();
+
     }
+
+    static int profitForward(int max, int pointer, int day, int dCount, int start, int end){
+        if(dCount >= 7){
+            dCount = 0;
+        }
+
+        if(pointer >= end){
+            return max;
+        }
+
+        int tmp = values[start][day] - values[pointer + start][dCount];
+        if(max < tmp){
+            max = tmp;
+            dCount = day + 2;
+            return Math.max(max, profitForward(max, pointer++, day++, dCount, start++, end));
+        }else{
+            profitForward(max, pointer++, day, dCount++, start, end);
+        }
+
+        return max;
+    }
+
 
     static class InputReader {
 

@@ -1,35 +1,116 @@
 import java.util.*;
 import java.io.*;
 
-public class GGG{
-    static int[][] goblinArray = new int[10001][10001];
+public class SD {
+    static int n;
+    static int[][] board = new int[101][101];
+    static List<Integer>[] colList = new ArrayList[101];
+    static boolean[][] instRow = new boolean [101][101];
+    static boolean[][] instCol = new boolean [101][101];
+    static int[][] rows = new int[101][101];
+    static int[][] cols = new int[101][101];
+    static int[] rowCount = new int[101];
+    static int[] colCount = new int[101];
+    static int completeRows;
+    static BitBoard[] bitsCol = new BitBoard[101];
+    static BitBoard[] bitsRow = new BitBoard[101];
+
+    static class BitBoard{
+        long r0;
+        long r1;
+
+        public BitBoard(long x, long y){
+            r0 = x;
+            r1 = y;
+        }
+    }
+
     public static void main(String [] args){
         InputReader io = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
 
-        int goblins = io.nextInt();
-        for(int i = 0; i < goblins; i++){
-            goblinArray[io.nextInt()][io.nextInt()]++;
+        n = io.nextInt();
+        completeRows = io.nextInt();
+
+        for(int i = 0; i < n; i++){
+            bitsCol[i] = new BitBoard(Long.MAX_VALUE, Long.MAX_VALUE);
+            bitsRow[i] = new BitBoard(Long.MAX_VALUE, Long.MAX_VALUE);
         }
 
-        int sprinklers = io.nextInt();
-        for(int i = 0; i < sprinklers; i++){
-            int x = io.nextInt();
-            int y = io.nextInt();
-            int r = io.nextInt();
-
-            for(int x1 = Math.max(x - r, 0); x1 < Math.min(x + r, 10000) + 1; x1++){
-                for(int y1 = Math.max(y - r, 0); y1 < Math.min(y + r, 10000) + 1; y1++){
-                    if(goblinArray[x1][y1] > 0 && (x - x1) * (x - x1) + (y - y1) * (y - y1) <= r*r){
-                        goblins -= goblinArray[x1][y1];
-                        goblinArray[x1][y1] = 0;
-                    }
-                }
+        for(int i = 0; i < completeRows; i++){
+            for(int j = 0; j < n; j++){
+                board[j][i] = io.nextInt();
+                instCol[board[j][i]][j] = true;
+                bitsCol[j].r0 = setBit(bitsCol[j].r0, board[j][i], false);
             }
         }
 
-        w.println(goblins);
+        if(!solveBoard(0, completeRows)){
+            w.println("no");
+        }else{
+            w.println("yes");
+            for(int i = 0; i < n; i++){
+                for(int j = 0; j < n; j++){
+                    w.print(board[j][i] + " ");
+                }
+            w.println();
+            }
+        }
+        
+        
         w.close();
+    }
+
+    static boolean solveBoard(int col, int row){
+        if(row == n){
+            return true;
+        }
+        
+        int newCol;
+        int newRow = row;
+        if(col == n - 1){
+            newCol = 0;
+            newRow = row + 1;
+        }else{
+            newCol = col + 1;
+        }
+
+        if(board[col][row] == 0){
+            for(int i = 0; i < n - completeRows; i++){
+                int val = colList[col].get(i);
+                if(!instCol[val][col] && !instRow[val][row]){
+                    instRow[val][row] = true;
+                    instCol[val][col] = true;
+                    bitsRow[row].r0 = setBit(bitsRow[row].r0, q, false);
+                    bitsCol[col].r0 = setBit(bitsCol[col].r0, q, false);
+                    board[col][row] = val;
+
+                    boolean result = solveBoard(newCol, newRow);
+                    if(result){
+                        return result;
+                    }
+                    
+                    instRow[val][row] = false;
+                    instCol[val][col] = false;
+                    board[col][row] = 0;
+                }
+            }
+
+            return false;
+        }else{
+            return solveBoard(newCol, newRow);
+        }
+    }
+
+    static long setBit(long b, int bitPosition, boolean bitValue){
+        if (bitValue){
+            return (b | (1 << bitPosition));
+        }
+        return (b & ~(1 << bitPosition));
+    }
+
+    static boolean getBit(long b, int bitPosition){
+        return (b & (1 << bitPosition)) != 0;
     }
 
     static class InputReader {
